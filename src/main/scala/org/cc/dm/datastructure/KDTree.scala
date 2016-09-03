@@ -52,7 +52,7 @@ object KDTree {
   // Range query
 
   // Hyper-cube definition from 2 opposite corners
-  type Point = Vec
+  type Point = Seq[Double]
   type Cube = (Point,Point)
 
   // Generic Range query to return points in a specified hyper-volume
