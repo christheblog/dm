@@ -83,7 +83,7 @@ class KDTreeTest extends FunSuite {
       vec(0.5,0.0,0.5),
       vec(0.75,0.0,0.75)
     )
-    val cube = (vec(0.0,0.0,0.0), vec(1.0,1.0,1.0))
+    val cube = (point(0.0,0.0,0.0), point(1.0,1.0,1.0))
     val kdtree = build(ds)
     assert(kdtree !== Empty)
     val inside = orthogonalQuery(kdtree)(cube)
@@ -120,7 +120,7 @@ class KDTreeTest extends FunSuite {
       vec(0.75,0.75,0.75)
     )
     val euclidean = (v1: Vec, v2: Vec) => math.sqrt((v1 zip v2).map { case (x,y) => (x-y) * (x-y)}.sum)
-    val sphere = (vec(0.0,0.0,0.0), 1.0)
+    val sphere = (point(0.0,0.0,0.0), 1.0)
     val kdtree = build(ds)
     assert(kdtree !== Empty)
     val inside = circularQuery(kdtree)(euclidean)(sphere)
@@ -151,6 +151,7 @@ class KDTreeTest extends FunSuite {
   // Helper
 
   def dataset(xs: Vec*): Seq[Vec] = IndexedSeq(xs:_*)
-  def vec(xs: Double*): Seq[Double] = IndexedSeq(xs:_*)
+  def vec(xs: Double*): Vec = IndexedSeq(xs:_*)
+  def point(xs: Double*): Point = IndexedSeq(xs:_*)
 
 }

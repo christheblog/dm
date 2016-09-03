@@ -13,9 +13,20 @@ package object data {
     def size = toSeq.size
   }
 
+  // Unsupervised
   trait UVec extends Vec
+  private case class UVecImpl(vector: Seq[Double]) extends UVec {
+    def apply(i: Int) = vector(i)
+    def toSeq = vector
+  }
+
+  // Supervised
   trait SVec[C] extends Vec {
     def sclass: C
+  }
+  private case class SVecImpl[C](vector: Seq[Double],sclass: C) extends SVec[C] with UVec {
+    def apply(i: Int) = vector(i)
+    def toSeq = vector
   }
 
   type Dataset = Seq[Vec]
@@ -28,17 +39,10 @@ package object data {
   // Building vectors
 
   // Unsupervised vector
-  def vec(s: Seq[Double]) = new UVec {
-    def apply(i: Int) = s(i)
-    def toSeq = s
-  }
+  def vec(s: Seq[Double]): UVec = new UVecImpl(s)
 
   // Supervised vector
-  def vec[C](s: Seq[Double], cl: C) = new SVec[C] {
-    def apply(i: Int) = s(i)
-    def toSeq = s
-    def sclass = cl
-  }
+  def vec[C](s: Seq[Double], cl: C): SVec[C] = new SVecImpl(s,cl)
 
 
   // Implicit conversion
