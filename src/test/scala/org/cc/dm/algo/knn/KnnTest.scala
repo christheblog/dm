@@ -2,7 +2,6 @@ package org.cc.dm.algo.knn
 
 import org.scalatest.FunSuite
 
-import collection.immutable.Seq
 import collection.immutable.IndexedSeq
 import org.cc.dm.data._
 import org.cc.dm.algo.knn.Knn._
@@ -86,6 +85,6 @@ class KnnTest extends FunSuite {
 
   def dataset(xs: RealVec*): RealDataset = IndexedSeq(xs:_*)
   def vec(xs: Double*): RealVec = IndexedSeq(xs:_*)
-  def svec(cl: String, xs: Double*): SRealVec[String] = data.vec(IndexedSeq(xs:_*),cl)
+  def svec(cl: String, xs: Double*): SRealVec[String] = data.vec(cl,IndexedSeq(xs:_*))
 
 }

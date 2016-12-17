@@ -46,10 +46,11 @@ package object data {
 
   // Unsupervised real-valued vector
   def vec(s: Seq[Double]): URealVec = new UVecImpl(s)
+  def vec(s: Double*): URealVec = new UVecImpl(s.toIndexedSeq)
 
   // Supervised real-valued vector
-  def vec[C](s: Seq[Double], cl: C): SRealVec[C] = new SVecImpl(s,cl)
-
+  def vec[C](cl: C, s: Seq[Double]): SRealVec[C] = new SVecImpl(s,cl)
+  def vec[C](cl: C, s: Double*): SRealVec[C] = new SVecImpl(s.toIndexedSeq,cl)
 
   // Implicit conversion
 
@@ -83,7 +84,7 @@ package object data {
   object Distance {
 
     // Find the closest candidate according to the provided distance function
-    // Returns th index of the closest in the original sequence, the closest vector and the min distance computed
+    // Returns the index of the closest in the original sequence, the closest vector and the min distance computed
     def closest(distfn: DistFn)(candidates: Seq[RealVec])(vec: RealVec): (Int,RealVec,Distance) =
       candidates.zipWithIndex.map { case (v,index) => (index,v,distfn(v,vec)) }.minBy(_._3)
 
@@ -124,6 +125,10 @@ package object data {
     def apply(i: Int): RealVec = seq(i)
     def toSeq: Seq[RealVec] = seq
   }
+  implicit def seqToSDataset[C,T <: SVec[C]](seq: Seq[T]): SDataset[C,T] = new SDataset[C,T] {
+    def apply(i: Int): T = seq(i)
+    def toSeq: Seq[T] = seq
+  }
 
 
   object Dataset {
@@ -141,12 +146,11 @@ package object data {
     def subset(ds: RealDataset, min: Int, max: Int): RealDataset =
       (math.max(0,min) to math.min(max,size(ds)-1)).map(ds(_))
 
-    // Splitting a dataset
+    // Splitting a dataset in a deterministic way
 
     def split2[T <: Vec](ds: Dataset[T]): (Dataset[T],Dataset[T]) = ??? // ds.splitAt(ds.size / 2)
     def splitn[T <: Vec](ds: Dataset[T])(n: Int): Seq[Dataset[T]] = ???
 
-    // Non-deterministic
     // TODO functional style random generator
     def sample[T <: Vec](ds: Dataset[T])(n: Int): Dataset[T] = ???
     def sample[T <: Vec](ds: Dataset[T])(percentage: Double): Dataset[T] = ???

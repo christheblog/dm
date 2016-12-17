@@ -15,6 +15,6 @@ object Majority {
   }
 
   // Classifying is just returning the most frequent class without any other processing
-  def classify[C](model: MajorityModel[C])(target: RealVec): Option[C] = model
+  def classify[C](model: MajorityModel[C])(target: UVec): Option[C] = model
 
 }
