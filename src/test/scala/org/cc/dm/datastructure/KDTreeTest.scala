@@ -119,7 +119,7 @@ class KDTreeTest extends FunSuite {
       // Outside
       vec(0.75,0.75,0.75)
     )
-    val euclidean = (v1: Vec, v2: Vec) => math.sqrt((v1 zip v2).map { case (x,y) => (x-y) * (x-y)}.sum)
+    val euclidean = (v1: RealVec, v2: RealVec) => math.sqrt((v1 zip v2).map { case (x,y) => (x-y) * (x-y)}.sum)
     val sphere = (point(0.0,0.0,0.0), 1.0)
     val kdtree = build(ds)
     assert(kdtree !== Empty)
@@ -140,7 +140,7 @@ class KDTreeTest extends FunSuite {
       vec(13.0,12.0),
       vec(14.0,13.0)
     )
-    val euclidean = (v1: Vec, v2: Vec) => math.sqrt((v1 zip v2).map { case (x,y) => (x-y) * (x-y)}.sum)
+    val euclidean = (v1: RealVec, v2: RealVec) => math.sqrt((v1 zip v2).map { case (x,y) => (x-y) * (x-y)}.sum)
     val kdtree = build(ds)
     assert(kdtree !== Empty)
     val nn = nnQuery(kdtree)(distfn=euclidean)(k=4)(target=vec(5,5)).reverse.map(_._1).toIndexedSeq
@@ -150,8 +150,8 @@ class KDTreeTest extends FunSuite {
 
   // Helper
 
-  def dataset(xs: Vec*): Seq[Vec] = IndexedSeq(xs:_*)
-  def vec(xs: Double*): Vec = IndexedSeq(xs:_*)
+  def dataset(xs: RealVec*): Seq[RealVec] = IndexedSeq(xs:_*)
+  def vec(xs: Double*): RealVec = IndexedSeq(xs:_*)
   def point(xs: Double*): Point = IndexedSeq(xs:_*)
 
 }

@@ -1,7 +1,7 @@
 package org.cc.dm.datastructure
 
 // Heap retaining at most k objects
-// Use of natural ordering will keep teh k smallest elements in a Max-Heap
+// Use of natural ordering will keep the k smallest elements in a Max-Heap
 // Useful in a KNN context to keep the K nearest neighbours according to some distance ordering
 object KHeap {
 
@@ -59,9 +59,14 @@ object KHeap {
     }
   }
 
-  // Merge 2 heaps and retsrict their size to k
-  def merge[T : Ordering](k: Int)(h1: KHeap[T], h2: KHeap[T]): KHeap[T] =
+  // Merge 2 heaps and restrict their size to k
+  def merge2[T : Ordering](k: Int)(h1: KHeap[T], h2: KHeap[T]): KHeap[T] =
     restrict(k)(merge(h1,h2))
+
+  // Merge n heaps and restrict their size to k
+  def merge[T : Ordering](k: Int)(hs: KHeap[T]*): KHeap[T] =
+    hs.foldLeft(empty[T]) { case (res,heap) => merge2(k)(res,heap) }
+
 
   // Restrict an existing heap to k elements
   def restrict[T : Ordering](k: Int)(heap: KHeap[T]): KHeap[T] = {

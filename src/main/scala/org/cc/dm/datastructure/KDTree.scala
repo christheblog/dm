@@ -8,11 +8,11 @@ object KDTree {
   // KDTree
   sealed trait KDTree
   case object Empty extends KDTree
-  case class KDNode(point: Vec, k: Int, less: KDTree, more: KDTree) extends KDTree
+  case class KDNode(point: RealVec, k: Int, less: KDTree, more: KDTree) extends KDTree
 
-  def build(ds: Dataset, k: Int = 0): KDTree = {
+  def build(ds: RealDataset, k: Int = 0): KDTree = {
     // Sort data and split at the median for dimension k - to get a balanced KDTree
-    def split(ds: Dataset, k: Int): (Dataset, Vec, Dataset) = {
+    def split(ds: RealDataset, k: Int): (RealDataset, RealVec, RealDataset) = {
       val sorted = ds.sortBy(_(k))
       val med = sorted.size / 2
       val (left,right) = sorted.splitAt(med)
@@ -28,7 +28,7 @@ object KDTree {
   }
 
   // Returns a stream of vectors encountered during a search for a target vector
-  def stream(tree: KDTree)(target: Vec): Stream[Vec] = tree match {
+  def stream(tree: KDTree)(target: RealVec): Stream[RealVec] = tree match {
     case Empty => Stream()
     case KDNode(v,k,less,more) =>
       if(v == target) Stream(v)
@@ -39,7 +39,7 @@ object KDTree {
 
 
   // Exact match query
-  def contains(tree: KDTree)(target: Vec): Boolean = tree match {
+  def contains(tree: KDTree)(target: RealVec): Boolean = tree match {
     case Empty => false
     case KDNode(v,k,less,more) =>
       if(v == target) true
@@ -58,9 +58,9 @@ object KDTree {
   // Generic Range query to return points in a specified hyper-volume
   // The inside of the hyper-volume is specified by a Vec => Boolean
   // The wrappingCube hyper-cube MUST contain totally the hyper-volume
-  def rangeQuery(tree: KDTree)(wrappingCube: Cube)(inside: Vec => Boolean): Stream[Vec] = {
+  def rangeQuery(tree: KDTree)(wrappingCube: Cube)(inside: RealVec => Boolean): Stream[RealVec] = {
     val (lower,upper) = wrappingCube
-    def loop(tree: KDTree): Stream[Vec] = {
+    def loop(tree: KDTree): Stream[RealVec] = {
       tree match {
         case Empty => Stream()
         case KDNode(v, k, less, more) =>
@@ -77,9 +77,9 @@ object KDTree {
   // Orthogonal range query
 
   // Orthogonal Range query to return points inside the specified hyper-cube
-  def orthogonalQuery(tree: KDTree)(cube: Cube): Stream[Vec] = {
+  def orthogonalQuery(tree: KDTree)(cube: Cube): Stream[RealVec] = {
     val (lower,upper) = cube
-    def inside(pt: Vec) =
+    def inside(pt: RealVec) =
       (lower zip pt).forall { case (x1,x2) => x1 <= x2 } &&
       (upper zip pt).forall { case (x1,x2) => x1 >= x2 }
     rangeQuery(tree)(cube)(inside)
@@ -93,11 +93,11 @@ object KDTree {
   type Ray = Double
   type Sphere = (Center,Ray)
 
-  def circularQuery(tree: KDTree)(distfn: DistFn)(sphere: Sphere): Stream[Vec] = {
+  def circularQuery(tree: KDTree)(distfn: DistFn)(sphere: Sphere): Stream[RealVec] = {
     val (center,ray) = sphere
     val (lower,upper) = (center.map(_ - ray),center.map(_ + ray))
     val cube = (lower,upper)
-    def inside(pt: Vec) = distfn(pt,center) <= ray
+    def inside(pt: RealVec) = distfn(pt,center) <= ray
     rangeQuery(tree)(cube)(inside)
   }
 
@@ -105,17 +105,17 @@ object KDTree {
   // K-nearest neighbours query
 
   type Distance = Double
-  def nnQuery(tree: KDTree)(distfn: DistFn)(k: Int)(target: Vec): Seq[(Vec,Distance)] = {
+  def nnQuery(tree: KDTree)(distfn: DistFn)(k: Int)(target: RealVec): Seq[(RealVec,Distance)] = {
     import KHeap._
     // Ordering of neighbours
-    implicit val order = new Ordering[(Vec,Distance)] {
-      def compare(o1: (Vec,Distance), o2: (Vec,Distance)) =
+    implicit val order = new Ordering[(RealVec,Distance)] {
+      def compare(o1: (RealVec,Distance), o2: (RealVec,Distance)) =
         if(o1._2 - o2._2 < 0) -1
         else if(o1._2 - o2._2 > 0) 1
         else 0
     }
 
-    def loop(node: KDTree, heap: KHeap[(Vec,Distance)]): KHeap[(Vec,Distance)] = node match {
+    def loop(node: KDTree, heap: KHeap[(RealVec,Distance)]): KHeap[(RealVec,Distance)] = node match {
       case Empty => heap
       case KDNode(v,dim,less,more) =>
         val distance = distfn(v,target)
@@ -127,7 +127,7 @@ object KDTree {
     }
 
     // Streaming the neighbours found
-    toStream(loop(tree,empty[(Vec,Distance)]))
+    toStream(loop(tree,empty[(RealVec,Distance)]))
   }
 
 }
