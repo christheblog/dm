@@ -55,7 +55,7 @@ class KMeansTest extends FunSuite {
     val kmIter = kmeans(ds)(distfn=Euclidean)(clusters=clusters)
     assert(clusters === kmIter.head)
     assert(clusters === kmIter.tail.head)
-    assert(clusters === kmIter.take(100).head)
+    assert(clusters === kmIter.drop(100).head)
   }
 
   test("Checking KMeans iteration on a known dataset with 1 element per cluster") {
@@ -89,8 +89,9 @@ class KMeansTest extends FunSuite {
     val ds = dataset(data:_*)
 
     val kmIter = kmeans(ds)(distfn=Euclidean)(clusters=clusters)
-    assert(data === kmIter.take(10).head)
+    assert(data === kmIter.drop(10).head)
   }
+
 
   // Helper
 
