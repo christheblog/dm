@@ -45,7 +45,7 @@ This is definitely useful when using some parallelism.
 
 Another implementation is using directly a KDTree and performs a nearest-neighbours query on it.
 ```scala
-def knn[C](tree: KDTree)(distfn: DistFn)(k: Int)(target: RealVec): KHeap[(Distance,RealVec)]
+def knn(tree: KDTree)(distfn: DistFn)(k: Int)(target: RealVec): KHeap[(Distance,RealVec)]
 ```
 
 

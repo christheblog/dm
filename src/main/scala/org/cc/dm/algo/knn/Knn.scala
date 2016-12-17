@@ -40,7 +40,7 @@ object Knn {
 
   // Knn using a KD-Tree with a nearest-neighbours query
   // Returns a KHeap as a result for consistency with other
-  def knn[C](tree: KDTree)(distfn: DistFn)(k: Int)(target: RealVec): KHeap[(Distance,RealVec)] = {
+  def knn(tree: KDTree)(distfn: DistFn)(k: Int)(target: RealVec): KHeap[(Distance,RealVec)] = {
     val kNeigbours = KDTree.nnQuery(tree)(distfn)(k)(target)
     implicit val order = NearestNeighbourDistanceOrdering
     KHeap.from(k)(kNeigbours.map(_.swap):_*)
